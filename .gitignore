@@ -1,0 +1,14 @@
+# Secrets & local data — never commit
+.streamlit/secrets.toml
+data/
+logs/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS/editor
+.DS_Store
+Thumbs.db
