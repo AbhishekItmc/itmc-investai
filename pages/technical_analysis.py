@@ -12,19 +12,35 @@ st.title("📐 Technical Analysis")
 
 watchlist = [s.replace(".NS", "") for s in db.get_watchlist()]
 
+st.session_state.setdefault("ta_text", "RELIANCE")
+
+
+def _pick_from_watchlist():
+    v = st.session_state.get("ta_pick")
+    if v:
+        st.session_state["ta_text"] = v
+        st.session_state["ta_pick"] = None
+
+
 c1, c2, c3 = st.columns([2, 1, 1])
 with c1:
-    if watchlist:
-        options = watchlist + ["(type another symbol…)"]
-        pick = st.selectbox("Symbol", options)
-        raw = st.text_input("Other symbol", "RELIANCE") if pick == options[-1] else pick
-    else:
-        raw = st.text_input("Symbol", "RELIANCE")
+    raw = st.text_input("Search stock", key="ta_text",
+                        help="NSE code (TCS) or company name (Infosys, HDFC Bank) — press Enter.")
 with c2:
     period = st.selectbox("Period", ["6mo", "1y", "2y", "5y"], index=1)
 with c3:
     show_bb = st.checkbox("Bollinger Bands", value=True)
     show_ma = st.checkbox("SMA 50/200", value=True)
+
+if watchlist:
+    try:
+        st.pills("⭐ Quick pick", watchlist, key="ta_pick", on_change=_pick_from_watchlist)
+    except Exception:  # older Streamlit without st.pills
+        cols = st.columns(min(len(watchlist), 8))
+        for col, w in zip(cols, watchlist[:8]):
+            if col.button(w, key=f"ta_wl_{w}"):
+                st.session_state["ta_text"] = w
+                st.rerun()
 
 symbol = md.resolve_symbol(raw)
 hist = md.get_history(symbol, period=period, interval="1d")
