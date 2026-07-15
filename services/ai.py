@@ -107,6 +107,47 @@ def build_context(symbols: list[str]) -> str:
     return json.dumps(blocks, default=str, ensure_ascii=False)
 
 
+def build_market_context() -> str:
+    """Whole-market snapshot for general questions ('what looks good now?').
+
+    Real computed data only: breadth pulse, top technical scores, rule-based
+    long setups (entry/target/stop arithmetic) and sector day moves.
+    """
+    from config import NIFTY50
+    from services import analytics, ideas
+
+    payload: dict = {"note": ("Data below is computed from real NIFTY 50 prices. "
+                              "Technical scores and setups are mechanical rules, "
+                              "not analyst opinions.")}
+    try:
+        closes = analytics.batch_closes(tuple(NIFTY50))
+        pulse = analytics.market_pulse(closes)
+        if pulse:
+            payload["market_pulse"] = pulse
+        scores = analytics.technical_scores(closes)
+        if not scores.empty:
+            payload["top10_by_technical_score"] = scores.head(10).to_dict("records")
+    except Exception as e:
+        log.warning("market context scores failed: %s", e)
+    try:
+        setups = ideas.generate_ideas(ideas.batch_ohlc(tuple(NIFTY50)))
+        if not setups.empty:
+            payload["rule_based_long_setups"] = (
+                setups.head(8).drop(columns=["rules"]).to_dict("records"))
+    except Exception as e:
+        log.warning("market context setups failed: %s", e)
+    try:
+        sectors = analytics.sector_performance()
+        if not sectors.empty:
+            payload["sector_day_change_pct"] = sectors.round(2).to_dict("records")
+    except Exception as e:
+        log.warning("market context sectors failed: %s", e)
+
+    if len(payload) == 1:
+        return "Market data could not be fetched right now."
+    return json.dumps(payload, default=str, ensure_ascii=False)
+
+
 def ask(chat_history: list[dict], context: str) -> str:
     """One completion. chat_history = [{'role','content'}, ...]. Returns text or error note."""
     try:

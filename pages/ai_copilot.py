@@ -52,13 +52,14 @@ if prompt:
     with st.chat_message("assistant"):
         with st.spinner("Fetching live data & thinking…"):
             symbols = ai.detect_symbols(prompt, known)
-            context = ai.build_context(symbols) if symbols else \
-                "No specific stock detected in the question. Ask the user to name a stock if needed."
+            context = ai.build_context(symbols) if symbols else ai.build_market_context()
             answer = ai.ask(st.session_state.chat, context)
         st.markdown(answer)
         if symbols:
             st.caption("Data fetched live for: " +
                        ", ".join(s.replace('.NS', '') for s in symbols))
+        else:
+            st.caption("Grounded on the live NIFTY 50 scan (pulse, scores, setups, sectors).")
     st.session_state.chat.append({"role": "assistant", "content": answer})
 
 if st.session_state.chat and st.button("🗑️ Clear conversation"):
