@@ -65,6 +65,7 @@ pages = st.navigation([
     st.Page("pages/technical_analysis.py", title="Technical Analysis", icon="📐"),
     st.Page("pages/portfolio.py", title="Portfolio", icon="💼"),
     st.Page("pages/ai_copilot.py", title="AI Copilot", icon="🤖"),
+    st.Page("pages/news.py", title="News", icon="📰"),
     st.Page("pages/settings.py", title="Settings", icon="⚙️"),
 ])
 
