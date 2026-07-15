@@ -5,4 +5,5 @@ pandas>=2.0
 numpy>=1.24
 openai>=1.30
 Authlib>=1.3
+psycopg[binary,pool]>=3.1
 
