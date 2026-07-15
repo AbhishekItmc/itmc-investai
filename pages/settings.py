@@ -18,10 +18,14 @@ if theme_choice != current_theme():
 st.divider()
 
 st.subheader("Profile")
-current_name = db.get_setting("display_name", "") or ""
-new_name = st.text_input("Display name (used in the Home greeting)", value=current_name)
-if st.button("Save name") :
-    db.set_setting("display_name", new_name.strip())
+from utils.user import current_user, display_name, save_display_name  # noqa: E402
+
+_u = current_user()
+if _u != "local":
+    st.caption(f"Signed in as **{_u}** — your name, watchlist and portfolio are personal to you.")
+new_name = st.text_input("Display name (used in the Home greeting)", value=display_name())
+if st.button("Save name"):
+    save_display_name(new_name)
     st.success("Saved.")
 
 st.divider()

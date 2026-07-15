@@ -10,7 +10,9 @@ from services import market_data as md
 
 st.title("📐 Technical Analysis")
 
-watchlist = [s.replace(".NS", "") for s in db.get_watchlist()]
+from utils.user import current_user  # noqa: E402
+
+watchlist = [s.replace(".NS", "") for s in db.get_watchlist(current_user())]
 
 st.session_state.setdefault("ta_text", "RELIANCE")
 

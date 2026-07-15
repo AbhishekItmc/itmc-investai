@@ -12,9 +12,11 @@ from services import analytics
 from services import market_data as md
 
 # ---- Greeting -----------------------------------------------------------------
+from utils.user import display_name  # noqa: E402
+
 hour = datetime.now().hour
 part = "Morning" if hour < 12 else "Afternoon" if hour < 17 else "Evening"
-name = db.get_setting("display_name", "") or "Investor"
+name = display_name()
 st.markdown(f'<p class="greeting">👋 Good {part}, {name}</p>', unsafe_allow_html=True)
 st.markdown(f'<p class="greeting-sub">{datetime.now():%A, %d %B %Y}</p>', unsafe_allow_html=True)
 

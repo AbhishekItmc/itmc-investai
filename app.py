@@ -93,7 +93,8 @@ with st.sidebar:
     # Watchlist snapshot
     try:
         from database import db as _db
-        wl = _db.get_watchlist()[:5]
+        from utils.user import current_user as _cu
+        wl = _db.get_watchlist(_cu())[:5]
         if wl:
             st.caption("⭐ Watchlist")
             from services import market_data as _md

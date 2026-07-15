@@ -46,7 +46,9 @@ if prompt:
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    known = tuple(db.get_watchlist()) + tuple(h["symbol"] for h in db.get_portfolio())
+    from utils.user import current_user
+    _u = current_user()
+    known = tuple(db.get_watchlist(_u)) + tuple(h["symbol"] for h in db.get_portfolio(_u))
     with st.chat_message("assistant"):
         with st.spinner("Fetching live data & thinking…"):
             symbols = ai.detect_symbols(prompt, known)

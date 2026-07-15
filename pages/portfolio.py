@@ -8,8 +8,12 @@ from components.ui import data_disclaimer
 from database import db
 from services import market_data as md
 from utils.formatters import inr, num, pct
+from utils.user import current_user
 
 st.title("💼 Portfolio")
+_u = current_user()
+if _u != "local":
+    st.caption(f"Your personal portfolio — {_u}")
 
 # ---- Add holding -------------------------------------------------------------
 with st.expander("➕ Add holding"):
@@ -27,13 +31,13 @@ with st.expander("➕ Add holding"):
                 st.error(f"'{symbol}' not found — not added.")
             else:
                 try:
-                    db.add_holding(symbol, qty, price, str(bdate))
+                    db.add_holding(symbol, qty, price, str(bdate), user=_u)
                     st.success(f"Added {symbol}.")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Could not save: {e}")
 
-holdings = db.get_portfolio()
+holdings = db.get_portfolio(_u)
 if not holdings:
     st.info("No holdings yet. Add your first one above.")
     st.stop()
@@ -86,7 +90,7 @@ for r in rows:
     dcolor = "green" if r["day_pnl"] >= 0 else "red"
     c[5].markdown(f":{dcolor}[{inr(r['day_pnl'], 0)}]")
     if c[6].button("✕", key=f"del_{r['id']}", help="Remove holding"):
-        db.remove_holding(r["id"])
+        db.remove_holding(r["id"], _u)
         st.rerun()
 
 st.divider()
