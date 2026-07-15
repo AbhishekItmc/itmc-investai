@@ -26,6 +26,13 @@ RULE_NAMES = ["Above SMA50", "SMA50 rising", "MACD bullish", "RSI 45–70", "1M 
 
 
 @st.cache_data(ttl=600, show_spinner=False)
+def last_scan_time() -> str:
+    """Approximates when the current cached scan was made (same TTL as data)."""
+    from datetime import datetime
+    return datetime.now().strftime("%d %b, %H:%M")
+
+
+@st.cache_data(ttl=600, show_spinner=False)
 def batch_ohlc(symbols: tuple[str, ...], period: str = "1y") -> dict[str, pd.DataFrame]:
     """One batched download -> {symbol: OHLCV DataFrame}."""
     try:

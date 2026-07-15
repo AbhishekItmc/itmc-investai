@@ -13,12 +13,22 @@ st.warning("⚠️ **These are rule-based calculations for study — not SEBI-re
            "investment advice.** No analyst has reviewed them. Markets can invalidate "
            "any setup at any time.", icon="⚠️")
 
-min_rules = st.radio("Setup strictness", [5, 4], index=1, horizontal=True,
-                     format_func=lambda v: f"{v}/5 rules")
+rc1, rc2 = st.columns([2, 1])
+with rc1:
+    min_rules = st.radio("Setup strictness", [5, 4], index=1, horizontal=True,
+                         format_func=lambda v: f"{v}/5 rules")
+with rc2:
+    if st.button("🔄 Rescan now", use_container_width=True):
+        idea_svc.batch_ohlc.clear()
+        idea_svc.last_scan_time.clear()
+        st.rerun()
 
 with st.spinner("Scanning NIFTY 50…"):
     ohlc = idea_svc.batch_ohlc(tuple(NIFTY50))
     setups = idea_svc.generate_ideas(ohlc, min_rules=min_rules)
+
+st.caption(f"Last scan: {idea_svc.last_scan_time()} · prices auto-refresh every 10 min · "
+           "setups are positional (daily-chart rules), so good ones naturally persist for days")
 
 if ohlc == {}:
     st.error("Could not fetch market data. Check your connection and retry.")
