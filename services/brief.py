@@ -6,7 +6,7 @@ computed from real prices, and its instructions forbid inventing numbers.
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, datetime
 
 from config import NIFTY50
 from database import db
@@ -24,8 +24,15 @@ give buy/sell instructions. End with: "_Rule-based data + AI interpretation —
 not investment advice._" Reply in English."""
 
 
+def _slot() -> str:
+    """Three refresh windows per trading day (IST-ish local time):
+    morning (before 12), midday (12–16), evening (after close)."""
+    h = datetime.now().hour
+    return "morning" if h < 12 else "midday" if h < 16 else "evening"
+
+
 def _key() -> str:
-    return f"daily_brief_{date.today().isoformat()}"
+    return f"daily_brief_{date.today().isoformat()}_{_slot()}"
 
 
 def cached_today() -> str | None:

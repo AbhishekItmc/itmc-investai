@@ -84,6 +84,20 @@ if c_test.button("🔌 Test connection", use_container_width=True):
         else:
             st.success(f"✅ Connection works! Response: {reply[:100]}")
 
+from utils.access import allowlist, db_list, is_admin, save_db_list  # noqa: E402
+
+if _u != "local" and is_admin(_u):
+    st.divider()
+    st.subheader("Team access")
+    st.caption("Only emails below (plus admins from secrets) can sign in. "
+               "Note: this list resets if the cloud app redeploys — put permanent "
+               "members in secrets.toml under [access] allowed_emails.")
+    emails_text = st.text_area("Allowed emails (one per line)",
+                               value="\n".join(sorted(db_list())), height=120)
+    if st.button("Save team list"):
+        save_db_list(emails_text)
+        st.success(f"Saved. Total allowed (incl. admins): {len(allowlist())}")
+
 st.divider()
 
 st.subheader("Data cache")

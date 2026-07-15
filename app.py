@@ -53,6 +53,29 @@ if _auth_configured():
             if st.button("🔐 Sign in with Google", use_container_width=True):
                 st.login()
         st.stop()
+    else:
+        from utils.access import is_allowed
+        _email = (st.user.email or "").lower()
+        if not is_allowed(_email):
+            st.markdown(
+                f"""
+                <div style="max-width:520px;margin:12vh auto;text-align:center;">
+                  <div class="aurora-card">
+                    <div style="font-size:2rem;">🔒</div>
+                    <h3>Access restricted</h3>
+                    <p style="color:var(--t2);">
+                      <b>{_email}</b> is not on the team list for this app.<br>
+                      Ask the administrator to add you.
+                    </p>
+                  </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            _, mid, _ = st.columns([1, 1, 1])
+            if mid.button("Log out", use_container_width=True):
+                st.logout()
+            st.stop()
 else:
     log.info("Auth not configured — running without login (see secrets.toml.example).")
 

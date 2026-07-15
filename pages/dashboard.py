@@ -111,8 +111,10 @@ if not ai.has_key():
 else:
     cached = brief.cached_today()
     if cached:
+        st.caption(f"Updated for this {brief._slot()} session — refreshes automatically "
+                   "morning, midday and after market close.")
         st.markdown(cached)
-        if st.button("🔄 Regenerate today's picks"):
+        if st.button("🔄 Regenerate now"):
             with st.spinner("Asking the AI…"):
                 ok, text = brief.generate(force=True)
             if ok:
